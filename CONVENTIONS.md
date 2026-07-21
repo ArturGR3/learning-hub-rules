@@ -1,6 +1,6 @@
 # Learning Hub — Conventions
 
-This is the tier-1 rules file. Every session in the hub loads it. Keep it short — it costs context every message. Recipes (tier-2) load on demand.
+This file is the single source of truth. Any agent that can fetch this URL has everything needed to build a blueprint. No follow-up fetches required. If your environment blocks follow-up fetches (claude.ai does this), everything you need is already here.
 
 ## Who the user is
 
@@ -12,33 +12,194 @@ Teach intuition-up: basic concepts → examples → intuition → precise terms.
 
 ## The hub
 
-Two repos:
+- **`learning-hub`** (private) — `topics/*.html` (the blueprints), `assets/blueprint.css` (shared styling), `log.md`, `index.html` (generated). Deployed to Cloudflare Pages at `https://learning-hub-3qh.pages.dev/`.
+- **`learning-hub-rules`** (public, this repo) — this file, plus `recipes/` and `template.html` for agents that can fetch them (optional — everything essential is already in this file).
 
-- **`learning-hub-rules`** (public, this repo) — `CONVENTIONS.md`, `recipes/`, `skills/`. Fetchable by any agent from `https://raw.githubusercontent.com/<you>/learning-hub-rules/main/...`.
-- **`learning-hub`** (private) — `topics/*.html` (the blueprints), `assets/blueprint.css`, `log.md`, `index.html` (generated), `CLAUDE.md`, `AGENTS.md`, `scripts/`, `.github/workflows/`.
+A blueprint is a self-contained HTML file at `topics/<name>.html`. Each teaches one topic, intuition-up, and links to its prerequisites and dependents. The substance is HTML — visuals, diagrams, worked examples — not markdown notes.
 
-A blueprint is a self-contained HTML file at `topics/<name>.html`. Each blueprint teaches one topic, intuition-up, and links to its prerequisites and dependents. The substance is HTML — visuals, diagrams, worked examples — not markdown notes.
+## How to build a blueprint
 
-## When building or refining a blueprint
+### Intuition-up ordering
 
-1. Fetch `recipes/blueprint.md` from this repo and follow it.
-2. Use the template (linked from the recipe) as the structural starting point.
-3. Fill every `<meta>` in the head: `source-chat`, `last-quizzed` (empty if new), `prerequisites`, `tags`, `created`, `last-updated`.
-4. **Maintain cross-references (Karpathy model).** Before filing, scan `topics/`. If the new/edited blueprint relates to existing ones, link to them in the body *and edit those pages to link back*. One write touches multiple files. The graph is the structure — no `taxonomy.md`, no enforced hierarchy. Categories emerge as clusters of cross-links.
-5. Append `log.md` in the private repo: `## [YYYY-MM-DD] {{ingest|refine|lint}} | {{topic}} — {{one-line summary}}`.
-6. Push. The GitHub Action rebuilds `index.html` and deploys.
+Teach in this order, adapted to what the topic needs:
 
-## When quizzing
+1. **The intuition first** — plain English, the metaphor or mental model, no jargon. The "why this exists" — what problem does the concept solve?
+2. **Examples** — concrete before abstract. The most familiar case first, then a second from a different angle if the concept has multiple modes.
+3. **The precise terms** — technical vocabulary, anchored to the intuition above.
+4. **Why it's shaped this way** — the structural insight, the trade-off the shape embodies.
 
-Fetch `recipes/quiz.md`. The Socratic protocol probes the user's *model* — asks them to predict, explain, generalize — not fact recall. After a quiz, update `<meta name="last-quizzed">` in the blueprint and push. The index Action surfaces blueprints not quizzed in 2+ weeks as a spaced-retrieval nudge.
+Not every section needs all four. The order is a default, not a law.
 
-## When linting
+### The visual-learning constraint
 
-Fetch `recipes/lint.md`. Look for: orphan blueprints (no inbound links), missing backlinks (A links to B but B doesn't link back), concepts mentioned in prose without their own blueprint, contradictions between pages. Append `log.md` with what was found and fixed.
+**Use a diagram for:** how parts relate (dependency graph, data flow), spatial structures (trees, hierarchies, overlapping distributions), transformations (one state becoming another), comparisons where shape matters (two distributions, before/after).
 
-## The metas
+**Don't use a diagram for:** definitions (a sentence is sharper), linear prose (a diagram of "step 1 → step 2" is decoration), anything you could explain equally well in one sentence.
 
-Every blueprint carries these in `<head>`:
+One per section unless the section is fundamentally visual. Every diagram uses the visual grammar established in the blueprint's legend (see pattern 1 below).
+
+### The five template patterns
+
+Every blueprint follows these. They are the load-bearing structure.
+
+**1. Visual grammar legend** — one line in the header, establishes the colors and symbols every diagram in the page will use:
+
+```html
+<div class="legend">
+  <span class="label">visual grammar</span>
+  <span class="swatch"><span class="dot" style="background:#1F7A6D;"></span><b>{{concept A}}</b></span>
+  <span class="swatch"><span class="dot" style="background:#B23A6E;"></span><b>{{concept B}}</b></span>
+  <span class="swatch"><span class="dot dashed"></span><b>{{counterfactual / imputed}}</b></span>
+</div>
+```
+
+The legend is taught once, used N times. A reader who has learned the grammar can scan every diagram without re-reading captions. Pick colors that carry meaning — `treated` vs `control`, `observed` vs `counterfactual` — not arbitrary decoration.
+
+**2. Modular sections** — each section opens with a chapter label and a title that is a *claim*, not a label:
+
+- ✅ "Why the average difference between groups lies"
+- ✅ "Compare like with like"
+- ❌ "Introduction to matching"
+- ❌ "Background"
+
+The title tells the reader what they'll understand by the end of the section. Sections are modular — no fixed order. Each picks from available blocks (prose, diagram, formula+where, key) as the topic needs.
+
+**3. Formula + "reading it"** — every formula is immediately followed by a plain-English breakdown that defines **every symbol, every time**. Vocabulary is re-stated, never assumed from earlier sections:
+
+```html
+<div class="formula">
+  <span class="lab">{{formula label}}</span>
+  <div class="eq">{{$$ formula $$}}</div>
+</div>
+<div class="where">
+  <span class="wlab">reading it</span>
+  <ul>
+    <li><b>{{symbol}}</b> — {{plain-English definition, one sentence}}</li>
+    <li><b>{{symbol}}</b> — {{plain-English definition, one sentence}}</li>
+    <li><b>{{whole expression}}</b> — {{what it says in words}}</li>
+  </ul>
+</div>
+```
+
+This is the single highest-value pattern — the anti-false-aha mechanism. A reader who skips the formula can still read the breakdown; a reader who reads both actually understands the formula.
+
+**4. Per-section "Remember"** — at the end of each section, a one-sentence distillation of the load-bearing insight. Often encodes the corrected misconception:
+
+```html
+<div class="key">
+  <span class="lab">Remember</span>
+  <p>{{one sentence — the thing you'd whisper to a friend.}}</p>
+</div>
+```
+
+"I thought X, but actually Y" lives here when the section is about a misconception the user held.
+
+**5. "In one breath" closing** — a single-paragraph synthesis of the whole topic. Each section's load-bearing insight strung together into one coherent statement:
+
+```html
+<section class="closing">
+  <div class="chno">In one breath</div>
+  <p class="breath">{{one paragraph — the whole topic, synthesized.}}</p>
+</section>
+```
+
+This is the "do I actually understand this?" test. If you can write it, you understand it. If you can't, the blueprint isn't done.
+
+### HTML template skeleton
+
+Copy this structure. CSS links to `blueprint.css` (resolves once deployed — artifact preview won't show styling, that's expected):
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="source-chat" content="">
+<meta name="last-quizzed" content="">
+<meta name="prerequisites" content="">
+<meta name="tags" content="">
+<meta name="created" content="">
+<meta name="last-updated" content="">
+<title>{{TOPIC}} — intuition blueprint</title>
+<link rel="stylesheet" href="/assets/blueprint.css">
+<!-- For math, add MathJax: -->
+<script>
+window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['$$','$$']] } };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
+</head>
+<body>
+<div class="page">
+
+  <header class="title">
+    <div class="eyebrow">Intuition Blueprint</div>
+    <h1>{{central question}}<span class="subtitle">{{topic}}</span></h1>
+    <div class="meta">
+      <span>created: {{DATE}}</span>
+      <span>last-updated: {{DATE}}</span>
+      <span class="tags">{{tags}}</span>
+    </div>
+    <div class="legend">
+      <span class="label">visual grammar</span>
+      <span class="swatch"><span class="dot" style="background:#1F7A6D;"></span><b>{{concept A}}</b></span>
+      <span class="swatch"><span class="dot" style="background:#B23A6E;"></span><b>{{concept B}}</b></span>
+      <span class="swatch"><span class="dot dashed"></span><b>{{counterfactual}}</b></span>
+    </div>
+  </header>
+
+  <section>
+    <div class="chno">{{01 — framing}}</div>
+    <h2>{{claim-title — what they'll understand by the end}}</h2>
+    <p>{{Plain-English intuition. The metaphor. The "why this exists".}}</p>
+    <div class="diagram">
+      <!-- <svg viewBox="0 0 540 120"> ... </svg> -->
+      <div class="caption">{{Fig. N — what to look at}}</div>
+    </div>
+    <div class="formula">
+      <span class="lab">{{formula label}}</span>
+      <div class="eq">{{$$ formula $$}}</div>
+    </div>
+    <div class="where">
+      <span class="wlab">reading it</span>
+      <ul>
+        <li><b>{{symbol}}</b> — {{plain-English definition}}</li>
+      </ul>
+    </div>
+    <div class="key">
+      <span class="lab">Remember</span>
+      <p>{{one-sentence distillation}}</p>
+    </div>
+  </section>
+
+  <!-- More sections follow the same pattern.
+       Inline cross-references: <a class="xref" href="#secNN">§NN</a> -->
+
+  <section class="closing">
+    <div class="chno">In one breath</div>
+    <p class="breath">{{one-paragraph synthesis — each section's insight strung together}}</p>
+  </section>
+
+  <div class="cross-refs">
+    <span class="label">prereqs</span>
+    <a href="{{prerequisite.html}}">{{prerequisite}}</a>
+    <span class="label" style="margin-left:20px;">leads to</span>
+    <a href="{{dependent.html}}">{{dependent}}</a>
+  </div>
+
+  <footer>
+    <span>blueprint v1 · last-quizzed: {{date or "—"}}</span>
+    <span>source: <a href="{{chat-url}}">{{chat}}</a></span>
+  </footer>
+
+</div>
+</body>
+</html>
+```
+
+### The metas
+
+Fill all of these in `<head>`:
 
 - `source-chat` — URL of the chat that produced the blueprint (for reopening the session)
 - `last-quizzed` — date of last Socratic quiz, empty if never
@@ -46,12 +207,81 @@ Every blueprint carries these in `<head>`:
 - `tags` — comma-separated cross-cutting labels
 - `created`, `last-updated` — dates
 
-## Recipes
+### Cross-references (Karpathy model)
 
-- `recipes/blueprint.md` — how to build a good learning blueprint (template patterns, visual-learning constraint, pedagogy)
-- `recipes/quiz.md` — Socratic quiz protocol
-- `recipes/lint.md` — hub health checks
+The graph is the structure. Before filing a new or edited blueprint:
 
-## Filing from a phone
+1. If you can see existing blueprints, link to related ones in the body AND in the `cross-refs` block. Edit those blueprints to link back. One write touches multiple files.
+2. Categories emerge as clusters of cross-links. There is no `taxonomy.md` and no enforced hierarchy.
+3. **If you can't see existing blueprints** (phone session, private repo unreachable): produce a standalone blueprint. Note "cross-refs needed" in the output. The user maintains the graph from laptop.
 
-Phone sessions in the claude.ai "Learning Hub" Project can generate artifacts but can't push to the repo. To file: copy the HTML out of the artifact, paste as a new file on github.com mobile, commit. The Action rebuilds and deploys. Cross-reference maintenance happens on the next laptop session.
+**Manifest (best-effort):** `https://learning-hub-3qh.pages.dev/manifest.json` lists all blueprints with metadata (filename, title, tags, prerequisites, last-quizzed). If you can fetch it, use it for cross-referencing. If your environment blocks it, skip — the blueprint works standalone.
+
+### What one blueprint covers
+
+A blueprint mirrors what one learning session produced. A focused session on DNS → one focused blueprint. A weeks-long session on causal inference → one field-through-line with multiple sections. The blueprint mirrors the session; the graph handles connections to the rest of the hub. Don't split a session's output artificially; don't merge unrelated sessions.
+
+### Filing checklist
+
+- [ ] Template used, all `<meta>` filled
+- [ ] Visual grammar legend present
+- [ ] Each section has a claim-title, not a label-title
+- [ ] Every formula has a "reading it" block defining every symbol
+- [ ] Each section has a "Remember" callout
+- [ ] "In one breath" closing written (the understanding test)
+- [ ] Diagrams used only where they earn their place (visual-learning constraint)
+- [ ] Cross-references added (or noted as needed for laptop follow-up)
+
+## How to quiz
+
+The Socratic protocol probes the *model*, not fact recall. Reading a blueprint produces a feeling of understanding that may be false; the quiz forces the user to do the connecting themselves.
+
+1. **Read the blueprint** the user names. The "Remember" callouts and "In one breath" are the densest source of load-bearing insights.
+2. **Ask one question at a time.** Wait for the answer before asking the next. Don't dump a list.
+3. **Probe the model, not recall.** Good questions:
+   - "Predict what happens if {{X is changed}}." — forces the user to use the model forward
+   - "Explain why {{Y}} is the case, in your own words." — forces synthesis
+   - "Generalize: would this still hold if {{Z}}?" — tests the boundaries
+   - "Here's a scenario: {{...}}. What would you expect, and why?" — applies to a new case
+   - "Compare {{A}} and {{B}} — what's the actual difference, and when does it matter?" — forces distinction
+
+   Bad questions (avoid): "What is the definition of X?", "True or false: ...", "List the steps in ..." — these test recall, not understanding.
+
+4. **After each answer:** say *what specifically* was right or wrong (not just "correct" / "incorrect"), then build the next question on what they showed they understood.
+5. **Use the blueprint's diagrams.** If the user is shaky, point them at a specific diagram and ask them to explain what it shows in their own words. Visual learners consolidate through the visuals.
+6. **End with a synthesis question** — "Sum up the whole topic in a paragraph, as if explaining to someone who hasn't read this." Their answer tells both of you whether the model is integrated or fragmentary.
+
+After the quiz: update `<meta name="last-quizzed">` in the blueprint and push. The index resets the spaced-retrieval nudge. If you can't push (phone session), tell the user the date to update.
+
+**Calibration:** if the user gets everything right, the next quiz should push toward edge cases and generalizations. If they struggle, anchor back to the intuition and diagrams before pushing to precise terms. The quiz is a learning tool, not an exam.
+
+## Filing from a phone (claude.ai)
+
+Phone sessions can generate blueprints but can't push to the private repo. The flow:
+
+1. Build the blueprint HTML following this file.
+2. Output the complete HTML for the user to copy.
+3. User goes to github.com mobile → `ArturGR3/learning-hub` repo → `topics/` → Add file → Create new file → name it `<slug>.html` → paste → commit.
+4. The GitHub Action rebuilds `index.html` and deploys to Cloudflare Pages.
+5. Cross-reference maintenance, `log.md` append, and `<meta name="last-quizzed">` updates happen on the next laptop session.
+
+The artifact preview in claude.ai won't show correct styling (the CSS lives in the private repo and loads only once deployed). The deployed version will look right.
+
+## Filing from a laptop (opencode, Claude Code)
+
+1. Build the blueprint following this file (or fetch `recipes/blueprint.md` and `template.html` from this repo for fuller detail — optional).
+2. Save to `topics/<slug>.html` in the `learning-hub` repo.
+3. Maintain cross-references: scan `topics/`, link related blueprints both directions.
+4. Append `log.md`: `## [YYYY-MM-DD] ingest | {{topic}} — {{one-line summary}}`.
+5. Push. The GitHub Action rebuilds `index.html` and deploys.
+
+## Optional reference files
+
+If your environment allows fetching from `raw.githubusercontent.com/ArturGR3/learning-hub-rules/main/` (opencode and Claude Code can; claude.ai cannot), these have fuller detail:
+
+- `recipes/blueprint.md` — extended pedagogy notes
+- `recipes/quiz.md` — full quiz protocol with calibration notes
+- `recipes/lint.md` — hub health checks (orphan blueprints, missing backlinks, contradictions)
+- `template.html` — full template with inlined CSS (for reference; the skeleton above is enough to build from)
+
+Everything essential to build a blueprint is already in this file. These are supplementary.
