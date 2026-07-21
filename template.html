@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- ═══ Blueprint metas — agent fills these ═══ -->
+<meta name="source-chat" content="">
+<meta name="last-quizzed" content="">
+<meta name="prerequisites" content="">
+<meta name="tags" content="">
+<meta name="created" content="">
+<meta name="last-updated" content="">
+<title>{{TOPIC}} — intuition blueprint</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=ET+Serif+Display:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;500&family=Source+Serif+Pro:ital,wght@0,400;0,600;1,400&display=swap');
+
+  :root {
+    --ink: #1a1a1a;
+    --soft: #555;
+    --rule: #d0d0d0;
+    --accent: #c8102e;
+    --paper: #fdfdfb;
+    --highlight: #fff8b8;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Source Serif Pro', Georgia, serif;
+    background: var(--paper);
+    color: var(--ink);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 48px 56px 96px;
+  }
+
+  /* ─── Header ─── */
+  header.title {
+    border-bottom: 1px solid var(--ink);
+    padding-bottom: 20px;
+    margin-bottom: 40px;
+  }
+  header.title .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+  header.title h1 {
+    font-family: 'ET Serif Display', Georgia, serif;
+    font-size: 36px;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    line-height: 1.05;
+    margin-bottom: 8px;
+  }
+  header.title h1 .subtitle {
+    font-weight: 400;
+    color: var(--soft);
+    font-style: italic;
+    display: block;
+    font-size: 20px;
+    margin-top: 4px;
+  }
+  header.title .meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--soft);
+    margin-top: 14px;
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  header.title .meta .tags { color: var(--accent); }
+
+  /* Visual grammar legend — one line, reused by every diagram */
+  .legend {
+    margin: 20px 0 0;
+    padding: 12px 16px;
+    background: rgba(0,0,0,0.02);
+    border: 1px solid var(--rule);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+  }
+  .legend .swatch { display: inline-flex; align-items: center; gap: 7px; }
+  .legend .dot { width: 11px; height: 11px; border-radius: 50%; display: inline-block; }
+  .legend .dot.dashed { background: transparent; border: 1.4px dashed var(--soft); }
+  .legend .swatch b { font-weight: 500; color: var(--ink); }
+  .legend .label {
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--soft);
+    margin-right: 2px;
+  }
+
+  /* ─── Sections ─── */
+  section {
+    margin-bottom: 40px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid var(--rule);
+  }
+  section:last-of-type { border-bottom: none; margin-bottom: 24px; }
+
+  .chno {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 10px;
+  }
+  h2 {
+    font-family: 'ET Serif Display', Georgia, serif;
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0 0 16px;
+    line-height: 1.15;
+  }
+  p { margin-bottom: 16px; }
+  p:last-child { margin-bottom: 0; }
+  strong { font-weight: 600; }
+  em { font-style: italic; }
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    background: rgba(200, 16, 46, 0.06);
+    padding: 1px 4px;
+  }
+
+  /* Inline cross-reference — §08 style */
+  .xref {
+    color: var(--accent);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    text-decoration: none;
+    border-bottom: 1px solid var(--accent);
+  }
+
+  /* Inline diagram */
+  .diagram {
+    margin: 20px 0;
+    padding: 14px 0;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+  }
+  .diagram svg, .diagram img {
+    display: block;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  .diagram .caption {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--soft);
+    margin-top: 8px;
+    text-align: center;
+  }
+
+  /* Formula + "reading it" — paired blocks */
+  .formula {
+    margin: 20px 0 0;
+    padding: 10px 18px 6px;
+    background: rgba(0,0,0,0.025);
+    border: 1px solid var(--rule);
+    border-left: 2px solid var(--ink);
+    overflow-x: auto;
+    text-align: center;
+  }
+  .formula .lab {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--soft);
+    display: block;
+    margin-bottom: 4px;
+    text-align: left;
+  }
+  .formula .eq {
+    font-family: 'ET Serif Display', serif;
+    font-size: 18px;
+    font-style: italic;
+    padding: 4px 0 8px;
+  }
+  .where {
+    margin: 0 0 20px;
+    padding: 10px 18px 12px;
+    background: rgba(0,0,0,0.025);
+    border: 1px solid var(--rule);
+    border-left: 2px solid var(--ink);
+    border-top: none;
+  }
+  .where .wlab {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    display: block;
+    margin-bottom: 6px;
+  }
+  .where ul { list-style: none; margin: 0; padding: 0; }
+  .where li {
+    padding: 5px 0;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--soft);
+    border-top: 1px dotted var(--rule);
+  }
+  .where li:first-child { border-top: none; }
+  .where li b { color: var(--ink); font-weight: 600; font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+
+  /* Per-section "Remember" — the load-bearing distillation */
+  .key {
+    margin: 18px 0 0;
+    padding: 12px 16px;
+    border-left: 3px solid var(--accent);
+    background: linear-gradient(90deg, rgba(200,16,46,0.05), transparent 70%);
+  }
+  .key .lab {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--accent);
+    display: block;
+    margin-bottom: 4px;
+  }
+  .key p { margin: 0; font-size: 15px; }
+
+  /* "In one breath" closing */
+  .closing {
+    margin-top: 24px;
+    padding-top: 28px;
+    border-top: 2px solid var(--ink);
+    border-bottom: none;
+  }
+  .closing .chno { color: var(--soft); }
+  .breath {
+    font-family: 'ET Serif Display', serif;
+    font-size: 19px;
+    line-height: 1.45;
+    font-style: italic;
+  }
+
+  /* Cross-references — graph edges */
+  .cross-refs {
+    margin-top: 28px;
+    padding-top: 16px;
+    border-top: 1px solid var(--rule);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--soft);
+  }
+  .cross-refs .label {
+    color: var(--accent);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-size: 10px;
+    margin-right: 8px;
+  }
+  .cross-refs a {
+    color: var(--ink);
+    text-decoration: none;
+    border-bottom: 1px solid var(--rule);
+    margin-right: 14px;
+  }
+  .cross-refs a:hover { border-bottom-color: var(--ink); }
+
+  footer {
+    margin-top: 40px;
+    padding-top: 16px;
+    border-top: 1px solid var(--rule);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--soft);
+    letter-spacing: 0.1em;
+    display: flex;
+    justify-content: space-between;
+  }
+  footer a { color: var(--ink); text-decoration: none; border-bottom: 1px solid var(--ink); }
+
+  @media (max-width: 640px) {
+    .page { padding: 32px 24px; }
+    header.title h1 { font-size: 28px; }
+    header.title h1 .subtitle { font-size: 18px; }
+    .breath { font-size: 17px; }
+    .formula .eq { font-size: 16px; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="title">
+    <div class="eyebrow">Intuition Blueprint</div>
+    <h1>{{central question}}<span class="subtitle">{{topic}}</span></h1>
+    <div class="meta">
+      <span>created: {{DATE}}</span>
+      <span>last-updated: {{DATE}}</span>
+      <span class="tags">{{tags}}</span>
+    </div>
+
+    <!-- ═══ Visual grammar legend — establish colors/symbols used throughout ═══ -->
+    <div class="legend">
+      <span class="label">visual grammar</span>
+      <span class="swatch"><span class="dot" style="background:#1F7A6D;"></span><b>{{concept A}}</b></span>
+      <span class="swatch"><span class="dot" style="background:#B23A6E;"></span><b>{{concept B}}</b></span>
+      <span class="swatch"><span class="dot dashed"></span><b>{{counterfactual}}</b></span>
+    </div>
+  </header>
+
+  <!-- ═══ MODULAR SECTIONS ═══
+       Order is topic-driven, not fixed. Each section picks from the available
+       blocks: prose, diagram, formula+where, key. Not all sections need all. -->
+
+  <section>
+    <div class="chno">{{01 — framing}}</div>
+    <h2>{{section title — a claim, not a label}}</h2>
+
+    <p>{{Plain-English intuition. The metaphor or mental model. No jargon yet, or jargon only if it was introduced in a prerequisite.}}</p>
+    <p>{{The "why this exists" — what problem does this concept solve?}}</p>
+
+    <!-- Optional inline diagram. Use the legend's grammar. -->
+    <div class="diagram">
+      <!-- <svg viewBox="0 0 540 120"> ... </svg> -->
+      <div class="caption">{{Fig. N — what to look at.}}</div>
+    </div>
+
+    <!-- Formula + "reading it". Define every symbol, every time.
+         Do NOT assume vocabulary from earlier sections. Re-state it. -->
+    <div class="formula">
+      <span class="lab">{{formula label}}</span>
+      <div class="eq">{{$$ formula $$}}</div>
+    </div>
+    <div class="where">
+      <span class="wlab">reading it</span>
+      <ul>
+        <li><b>{{symbol}}</b> — {{plain-English definition}}</li>
+        <li><b>{{symbol}}</b> — {{plain-English definition}}</li>
+        <li><b>{{whole expression}}</b> — {{what it says in words}}</li>
+      </ul>
+    </div>
+
+    <!-- Per-section Remember. The load-bearing one-sentence distillation.
+         Often encodes the corrected misconception. -->
+    <div class="key">
+      <span class="lab">Remember</span>
+      <p>{{one sentence that captures the load-bearing insight.}}</p>
+    </div>
+  </section>
+
+  <!-- More sections follow the same pattern. Inline cross-references
+       like <a class="xref" href="#sec08">§08</a> make the graph visible. -->
+
+  <!-- ═══ "In one breath" — single-paragraph synthesis ═══ -->
+  <section class="closing">
+    <div class="chno">In one breath</div>
+    <p class="breath">{{One paragraph that synthesizes the whole topic — each section's load-bearing insight strung together. If you can write this, you understand it.}}</p>
+  </section>
+
+  <div class="cross-refs">
+    <span class="label">prereqs</span>
+    <a href="{{prerequisite.html}}">{{prerequisite}}</a>
+    <span class="label" style="margin-left:20px;">leads to</span>
+    <a href="{{dependent.html}}">{{dependent}}</a>
+  </div>
+
+  <footer>
+    <span>blueprint v1 · last-quizzed: {{date or "—"}}</span>
+    <span>source: <a href="{{chat-url}}">{{chat}}</a></span>
+  </footer>
+
+</div>
+</body>
+</html>
