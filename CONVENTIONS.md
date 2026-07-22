@@ -1,6 +1,6 @@
 # Learning Hub — Conventions
 
-This file is the single source of truth. Any agent that can fetch this URL has everything needed to build a blueprint. No follow-up fetches required. If your environment blocks follow-up fetches (claude.ai does this), everything you need is already here.
+This file is the single source of truth. Everything you need to build a blueprint is below — the template skeleton, the five patterns, the quiz protocol, the filing checklist. **Do not attempt to fetch any other URL from this repo** (recipes, template.html). If a fetch fails, you already have what you need. If you cannot fetch this file at all, ask the user to paste it.
 
 ## Who the user is
 
@@ -107,7 +107,7 @@ This is the "do I actually understand this?" test. If you can write it, you unde
 
 ### HTML template skeleton
 
-Copy this structure. CSS links to `blueprint.css` (resolves once deployed — artifact preview won't show styling, that's expected):
+Copy this structure. CSS uses an absolute URL so it renders in artifact preview AND when deployed:
 
 ```html
 <!DOCTYPE html>
@@ -122,7 +122,7 @@ Copy this structure. CSS links to `blueprint.css` (resolves once deployed — ar
 <meta name="created" content="">
 <meta name="last-updated" content="">
 <title>{{TOPIC}} — intuition blueprint</title>
-<link rel="stylesheet" href="/assets/blueprint.css">
+<link rel="stylesheet" href="https://learning-hub-3qh.pages.dev/assets/blueprint.css">
 <!-- For math, add MathJax: -->
 <script>
 window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['$$','$$']] } };
@@ -213,7 +213,7 @@ The graph is the structure. Before filing a new or edited blueprint:
 
 1. If you can see existing blueprints, link to related ones in the body AND in the `cross-refs` block. Edit those blueprints to link back. One write touches multiple files.
 2. Categories emerge as clusters of cross-links. There is no `taxonomy.md` and no enforced hierarchy.
-3. **If you can't see existing blueprints** (phone session, private repo unreachable): produce a standalone blueprint. Note "cross-refs needed" in the output. The user maintains the graph from laptop.
+3. **If you can't see existing blueprints** (phone session, private repo unreachable): produce a standalone blueprint. **Do not create `<a>` links to blueprints you cannot verify exist** — a link to a non-existent file is a dangling reference that breaks the graph. Instead, list related concepts as HTML comments (`<!-- future blueprint: dns.html -->`) for the user to wire up from laptop. The user maintains the graph from laptop.
 
 **Manifest (best-effort):** `https://learning-hub-3qh.pages.dev/manifest.json` lists all blueprints with metadata (filename, title, tags, prerequisites, last-quizzed). If you can fetch it, use it for cross-referencing. If your environment blocks it, skip — the blueprint works standalone.
 
