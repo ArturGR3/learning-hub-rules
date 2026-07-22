@@ -271,8 +271,8 @@ The artifact preview should show correct styling via the absolute CSS URL. If it
 
 1. Build the blueprint following this file.
 2. Save to `topics/<slug>.html` in the `learning-hub` repo.
-3. Maintain cross-references: scan `topics/`, link related blueprints both directions.
-4. Append `log.md`: `## [YYYY-MM-DD] ingest | {{topic}} — {{one-line summary}}`.
-5. Push. The GitHub Action rebuilds `index.html` and deploys.
+3. Maintain cross-references: scan `topics/`, link related blueprints both directions. Edit linked blueprints to add back-links.
+4. Run `scripts/file-blueprint.sh topics/<slug>.html "{{topic}} — {{one-line summary}}"` from the repo root. This validates the blueprint, appends `log.md`, stages source files, commits, and pushes. Don't run `build-index.py` locally — the GitHub Action regenerates `index.html` and `manifest.json` on push.
+5. The Action rebuilds and deploys (~30s).
 
 

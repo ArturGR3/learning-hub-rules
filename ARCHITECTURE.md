@@ -97,14 +97,21 @@ Relative `/assets/blueprint.css` doesn't render in claude.ai artifact previews (
 
 Every push to `main` that touches `topics/**`, `assets/**`, or `scripts/**` triggers the GitHub Action (`.github/workflows/deploy.yml`):
 
-1. **`build-index.py` runs** — scans all `topics/*.html`, extracts `<meta>` tags and `<a href>` links between blueprints
-2. **Generates two files:**
+1. **`validate.py` runs** — checks all `topics/*.html` against conventions (required metas, absolute CSS URL, required class names, no dangling cross-refs). Fails the build if violations found.
+2. **`build-index.py` runs** — scans all `topics/*.html`, extracts `<meta>` tags and `<a href>` links between blueprints
+3. **Generates two files:**
    - `index.html` — visual landing page (lists blueprints, shows quiz nudges, shows graph edges)
    - `manifest.json` — machine-readable metadata (filename, title, tags, prerequisites, last-quizzed, links-to, linked-by)
-3. **Commits them back** with `[skip ci]` (no infinite loop)
-4. **Deploys to Cloudflare Pages** via `cloudflare/pages-action@v1`
+4. **Commits them back** with `[skip ci]` (no infinite loop)
+5. **Deploys to Cloudflare Pages** via `cloudflare/pages-action@v1`
 
 Total time: ~30 seconds.
+
+### `validate.py` — mechanical convention enforcement
+Replaces prompt-based "don't do X" instructions with deterministic CI checks. Catches: missing metas, relative CSS URLs, missing required class names, dangling cross-references to non-existent blueprints. Reference pages (`<meta name="blueprint-type" content="reference">`) are exempt from teaching-specific classes (legend, formula, where, key, closing, breath). Deploy fails on validation errors — immediate feedback.
+
+### `file-blueprint.sh` — filing hygiene
+A script agents run instead of doing 5 manual steps: `./scripts/file-blueprint.sh topics/<slug>.html "<log-message>"`. Validates, appends log.md, stages only source files (never generated index.html/manifest.json), commits, pushes. Prevents: running build-index.py locally, committing generated files, forgetting log.md.
 
 ### `manifest.json` — why it exists
 claude.ai agents can't read the private repo's `topics/` directory. The manifest (deployed to the public pages.dev URL) lets agents that can fetch it see what blueprints already exist, for cross-referencing. If they can't fetch it, blueprints work standalone — cross-ref maintenance happens on laptop.
@@ -125,6 +132,12 @@ In claude.ai testing, an agent invented 4 cross-links to blueprints that didn't 
 ---
 
 ## 7. Design choices and rationale
+
+### Why three modes (teach / crystallize / build)
+The original skill assumed one flow: teach → build → file. Real usage revealed three distinct cases. **Teach** is a dedicated learning session ("teach me DNS"). **Crystallize** is capturing learnings from a work session ("summarize what we covered") — the teaching already happened embedded in the work; the agent outlines topics, checks understanding, fills gaps, then generates blueprints with "Remember" callouts from real misconceptions. **Build** is just generating an artifact. The mode is inferred from the user's request — no upfront questions. Each mode has its own natural gate (teaching confirmation, outline agreement, or direct generation).
+
+### Why mechanical enforcement over prompts
+Prompts are non-deterministic. Three claude.ai test runs showed agents violating explicit instructions (inlined CSS, custom class names, dangling cross-links). `validate.py` catches these mechanically in CI — deploy fails on violation. `file-blueprint.sh` handles filing hygiene mechanically. The SKILL.md gets simpler (fewer "don't do X" rules) because the scripts enforce them. Agents get more freedom (try anything, validate.py catches mistakes) rather than more rules.
 
 ### Why CONVENTIONS.md is self-contained
 Originally tier-1 (short) with tier-2 recipes fetched on demand. Broke in claude.ai (blocks constructed raw URLs to non-indexed repos). Fix: inline everything. One fetch = everything. See section 3.
@@ -196,7 +209,9 @@ Every time `build-index.py` runs locally, it generates `index.html` and `manifes
 |------|-------------|
 | `topics/*.html` | The blueprints |
 | `assets/blueprint.css` | Shared stylesheet, linked by every blueprint via absolute URL |
-| `scripts/build-index.py` | Scans `topics/`, generates `index.html` + `manifest.json` |
+| `scripts/validate.py` | Convention enforcement — checks metas, CSS URL, class names, cross-refs | Runs in CI before build-index.py |
+| `scripts/file-blueprint.sh` | Filing script — validate → log → stage → commit → push | Agents run this instead of manual steps |
+| `scripts/build-index.py` | Scans `topics/`, generates `index.html` + `manifest.json` | Runs in CI on push |
 | `.github/workflows/deploy.yml` | Push → rebuild → deploy to Cloudflare Pages |
 | `index.html` | Generated (not hand-maintained) |
 | `manifest.json` | Generated (not hand-maintained) |
@@ -223,17 +238,17 @@ cp learning-hub-rules/skills/learn/SKILL.md ~/.claude/skills/learn/SKILL.md
 ### Built and working
 - Two-repo architecture (public rules, private content)
 - `CONVENTIONS.md` — self-contained, fetched by agents
-- `/learn` skill — installed for opencode and Claude Code
-- GitHub Action — push → rebuild index + manifest → deploy to Cloudflare Pages
+- `/learn` skill — three modes (teach / crystallize / build), installed for opencode and Claude Code
+- GitHub Action — validate → rebuild index + manifest → deploy to Cloudflare Pages
+- `validate.py` — mechanical convention enforcement (metas, CSS URL, class names, cross-refs)
+- `file-blueprint.sh` — filing hygiene script (validate → log → stage → commit → push)
 - `manifest.json` — public metadata for cross-referencing
 - `build-index.py` — scans topics, generates index and manifest
-- 2 blueprints in the hub: `causal-inference.html`, `system-architecture.html`
+- 3 blueprints in the hub: `causal-inference.html`, `simple-regression.html`, `system-architecture.html`
 - Cloudflare Pages deploy verified (both via Action and manual wrangler)
+- First end-to-end laptop test completed (simple-regression blueprint built, filed, deployed)
 
 ### Not yet done
-- **Validation script** — `validate.py` to check blueprints against the spec (metas, CSS URL, class names, cross-refs) before deploy. Should be wired into the GitHub Action.
-- **Learn mode** — interactive learning conversation before blueprint generation. The user wants: agent asks what they know → finds gaps → teaches to gaps → crystallizes into a blueprint with "Remember" callouts from *real* misconceptions. Agent should ask which mode (learn vs build) at the start of every session.
 - **claude.ai Project instructions** — the full guardrail instructions have been prepared but not yet pasted into the Project settings (only the one-line fetch pointer is there).
-- **Skill file sync** — installed copies at `~/.agents/` and `~/.claude/` have a stale parenthetical that the rules repo copy has removed.
-- **End-to-end testing** — the full `/learn` → build → file → deploy loop has not been tested in opencode or Claude Code. The claude.ai flow has been tested 3 times with progressive fixes.
-- **Lint** — `recipes/lint.md` describes health checks (orphan blueprints, missing backlinks, contradictions). Worth running once there are 3+ blueprints.
+- **End-to-end test of new three-mode skill** — the simple-regression test used the old SKILL.md. The restructured skill (teach/crystallize/build) needs a real test to verify the flows work.
+- **Lint** — `recipes/lint.md` describes health checks (orphan blueprints, missing backlinks, contradictions). Worth running once there are 4+ blueprints.

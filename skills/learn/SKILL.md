@@ -1,31 +1,61 @@
 ---
 name: learn
-description: Trigger a learning session. Fetches the Learning Hub conventions and turns the current session into a learning session — teach a concept intuition-up, generate a blueprint, file it into the hub.
+description: Trigger a learning session. Crystallize understanding into a blueprint — teach a concept from scratch, capture learnings from a work session, or generate a blueprint directly.
 ---
 
 # /learn
 
-Invoke this skill mid-build when you hit a concept you want to understand, not just use.
+Invoke this skill when you want to crystallize understanding into a blueprint.
 
-## What it does
+## Step 1: Fetch conventions
 
-1. Fetch `https://raw.githubusercontent.com/ArturGR3/learning-hub-rules/main/CONVENTIONS.md` and read it.
-2. The current session is now a learning session. Apply the conventions: who the user is, how to teach, the hub rules.
-3. CONVENTIONS.md is fully self-contained — it has the five template patterns, the HTML template skeleton, the quiz protocol, and the filing checklist inline. No follow-up fetches needed.
-4. When the user asks for a blueprint on a concept, build it per CONVENTIONS.md. Use the template skeleton. Fill all metas. Maintain cross-references if you can see existing blueprints.
-5. **If you have repo access** (opencode, Claude Code): file the blueprint into the private `learning-hub` repo — save `topics/<name>.html`, update cross-refs in related blueprints, append `log.md`, push. The GitHub Action rebuilds the index and deploys.
-6. **If you don't have repo access** (claude.ai phone session): output the complete HTML for the user to copy into GitHub manually. Note any cross-refs that need laptop follow-up.
-7. Offer to quiz the user on the blueprint (Socratic protocol is in CONVENTIONS.md).
-8. Offer to resume the original build.
+Fetch `https://raw.githubusercontent.com/ArturGR3/learning-hub-rules/main/CONVENTIONS.md` and read it. Then fetch `https://learning-hub-3qh.pages.dev/manifest.json` (best-effort — skip if blocked; it lists existing blueprints for cross-referencing).
 
-## When invoked mid-build
+CONVENTIONS.md is fully self-contained — template skeleton, five patterns, quiz protocol, filing checklist. No other fetches needed. Do not fetch recipes, template.html, the CSS file, or build scripts.
 
-Pause the build. Don't lose context — note where you were. Teach the concept. Generate the blueprint. File it. Then offer to resume.
+## Step 2: Determine the mode
 
-## Manifest (best-effort)
+Infer the mode from the user's request. Don't ask upfront — start with the natural first action.
 
-`https://learning-hub-3qh.pages.dev/manifest.json` lists all existing blueprints with metadata. Fetch it if you can — it tells you what blueprints already exist so you can cross-reference. If your environment blocks it, skip; the blueprint works standalone.
+### TEACH — "teach me X" / "I want to understand X"
 
-## One-line pointer
+The user wants to learn something new. This is a dedicated learning session.
 
-This skill is a thin wrapper. The actual rules live in CONVENTIONS.md at the URL above. CONVENTIONS.md is self-contained — everything needed to build a blueprint is there. Content evolves underneath; this skill rarely needs to change.
+1. **Diagnose**: Figure out where the user's understanding currently is. Ask what they know, probe gently. Have a conversation, not a questionnaire.
+2. **Teach**: Build up from the user's current level. Intuition first, then examples, then precise terms. Use the conventions' intuition-up ordering. Diagrams where they earn their place. This is a conversation, not a monologue — check understanding as you go.
+3. **Crystallize**: After teaching, ask "Want me to crystallize this into a blueprint?" If yes → generate the blueprint from the teaching → file it (step 3). If no → offer a quiz, done.
+
+### CRYSTALLIZE — "summarize what we learned" / "make blueprints for what we covered"
+
+The user has been working (with you or another agent) and wants to capture learnings. The teaching already happened, embedded in the work.
+
+1. **Outline**: Review the conversation for concepts worth capturing. Propose an outline: "Here are N topics: 1. X, 2. Y, 3. Z." Let the user modify the list.
+2. **Check understanding**: For each topic, ask the user if it's clear. Ask clarifying questions. Fill gaps with mini-teaching where needed. The "Remember" callouts in the blueprint should come from real gaps or misconceptions discovered here — not generic statements.
+3. **Crystallize**: Generate each blueprint from the conversation + the clarification feedback. File each (step 3).
+
+### BUILD — "build a blueprint for X" / "generate a blueprint"
+
+The user knows what they want and just wants the artifact.
+
+1. **Generate**: Build the blueprint per CONVENTIONS.md. Use the template skeleton. Fill all metas. Maintain cross-references.
+2. **File** (step 3).
+
+## Step 3: File the blueprint
+
+**If you have repo access** (opencode, Claude Code):
+
+1. Find or clone the `learning-hub` repo. Try the local filesystem first (e.g. `~/playground/learning-hub`); clone `ArturGR3/learning-hub` if not found.
+2. Save the blueprint to `topics/<slug>.html`.
+3. Maintain cross-references: scan `topics/`, link related blueprints both directions. Edit linked blueprints to add back-links.
+4. Run `scripts/file-blueprint.sh topics/<slug>.html "{{topic}} — {{one-line summary}}"` from the repo root. This validates the blueprint, appends log.md, stages source files, commits, and pushes. **Don't run build-index.py locally** — the GitHub Action regenerates index.html and manifest.json on push.
+5. The Action rebuilds and deploys (~30s).
+
+**If you don't have repo access** (claude.ai phone session): output the complete HTML for the user to copy into GitHub manually. Note cross-refs for laptop follow-up.
+
+## Plan mode
+
+If in plan mode: teach (text output), outline (text output), or generate HTML (text output). All are allowed. Then ask the user to exit plan mode for filing — writing files requires build mode. Don't present a "plan" of blueprint sections — the conventions define the structure. Just teach / outline / build.
+
+## After filing
+
+Offer to quiz the user (Socratic protocol is in CONVENTIONS.md). One question at a time, probe the model not recall, end with synthesis.
