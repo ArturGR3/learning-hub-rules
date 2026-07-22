@@ -13,7 +13,7 @@ Teach intuition-up: basic concepts → examples → intuition → precise terms.
 ## The hub
 
 - **`learning-hub`** (private) — `topics/*.html` (the blueprints), `assets/blueprint.css` (shared styling), `log.md`, `index.html` (generated). Deployed to Cloudflare Pages at `https://learning-hub-3qh.pages.dev/`.
-- **`learning-hub-rules`** (public, this repo) — this file, plus `recipes/` and `template.html` for agents that can fetch them (optional — everything essential is already in this file).
+- **`learning-hub-rules`** (public, this repo) — this file. (recipes/ and template.html also exist for human readers; agents don't need them.)
 
 A blueprint is a self-contained HTML file at `topics/<name>.html`. Each teaches one topic, intuition-up, and links to its prerequisites and dependents. The substance is HTML — visuals, diagrams, worked examples — not markdown notes.
 
@@ -265,23 +265,14 @@ Phone sessions can generate blueprints but can't push to the private repo. The f
 4. The GitHub Action rebuilds `index.html` and deploys to Cloudflare Pages.
 5. Cross-reference maintenance, `log.md` append, and `<meta name="last-quizzed">` updates happen on the next laptop session.
 
-The artifact preview in claude.ai won't show correct styling (the CSS lives in the private repo and loads only once deployed). The deployed version will look right.
+The artifact preview should show correct styling via the absolute CSS URL. If it doesn't render, the deployed version will — the stylesheet loads from the hub's Pages URL.
 
 ## Filing from a laptop (opencode, Claude Code)
 
-1. Build the blueprint following this file (or fetch `recipes/blueprint.md` and `template.html` from this repo for fuller detail — optional).
+1. Build the blueprint following this file.
 2. Save to `topics/<slug>.html` in the `learning-hub` repo.
 3. Maintain cross-references: scan `topics/`, link related blueprints both directions.
 4. Append `log.md`: `## [YYYY-MM-DD] ingest | {{topic}} — {{one-line summary}}`.
 5. Push. The GitHub Action rebuilds `index.html` and deploys.
 
-## Optional reference files
 
-If your environment allows fetching from `raw.githubusercontent.com/ArturGR3/learning-hub-rules/main/` (opencode and Claude Code can; claude.ai cannot), these have fuller detail:
-
-- `recipes/blueprint.md` — extended pedagogy notes
-- `recipes/quiz.md` — full quiz protocol with calibration notes
-- `recipes/lint.md` — hub health checks (orphan blueprints, missing backlinks, contradictions)
-- `template.html` — full template with inlined CSS (for reference; the skeleton above is enough to build from)
-
-Everything essential to build a blueprint is already in this file. These are supplementary.

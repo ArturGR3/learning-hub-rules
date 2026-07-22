@@ -11,7 +11,7 @@ Invoke this skill mid-build when you hit a concept you want to understand, not j
 
 1. Fetch `https://raw.githubusercontent.com/ArturGR3/learning-hub-rules/main/CONVENTIONS.md` and read it.
 2. The current session is now a learning session. Apply the conventions: who the user is, how to teach, the hub rules.
-3. CONVENTIONS.md is fully self-contained — it has the five template patterns, the HTML template skeleton, the quiz protocol, and the filing checklist inline. No follow-up fetches needed. (If your environment allows fetching from the rules repo, `recipes/` and `template.html` are optional supplementary detail.)
+3. CONVENTIONS.md is fully self-contained — it has the five template patterns, the HTML template skeleton, the quiz protocol, and the filing checklist inline. No follow-up fetches needed.
 4. When the user asks for a blueprint on a concept, build it per CONVENTIONS.md. Use the template skeleton. Fill all metas. Maintain cross-references if you can see existing blueprints.
 5. **If you have repo access** (opencode, Claude Code): file the blueprint into the private `learning-hub` repo — save `topics/<name>.html`, update cross-refs in related blueprints, append `log.md`, push. The GitHub Action rebuilds the index and deploys.
 6. **If you don't have repo access** (claude.ai phone session): output the complete HTML for the user to copy into GitHub manually. Note any cross-refs that need laptop follow-up.
