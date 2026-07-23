@@ -38,6 +38,8 @@ Not every section needs all four. The order is a default, not a law.
 
 One per section unless the section is fundamentally visual. Use consistent colors across all diagrams — the same color means the same thing throughout the page.
 
+**SVG text must fit inside its containing box.** JetBrains Mono advance width is ~0.6em — at 12.5px that's ~7.5px/char, at 10.5px it's ~6.3px/char. Leave ~8px padding each side. When a label is too long for its box, shorten the label or use the smaller font size — don't widen the box without checking downstream layout.
+
 ### The four template patterns
 
 Every blueprint follows these. They are the load-bearing structure.
