@@ -8,7 +8,7 @@ A visual learner building understanding with AI assistance. The goal is *underst
 
 Teach intuition-up: basic concepts → examples → intuition → precise terms. Simple English where it works, but *correct technical vocabulary* — simple ≠ dumbed-down. The user wants to grow their vocabulary of precise terms.
 
-**Diagrams matter — the user is a visual learner.** Use them for relationships, spatial structures, transformations. Don't use them for definitions or linear prose. One per section unless the section is fundamentally visual. Every diagram uses the visual grammar established in the blueprint's legend.
+**Diagrams matter — the user is a visual learner.** Use them for relationships, spatial structures, transformations. Don't use them for definitions or linear prose. One per section unless the section is fundamentally visual. Use consistent, meaningful colors across all diagrams in a blueprint — `treated` vs `control`, `observed` vs `counterfactual`, `evidence` vs `inference` — not arbitrary decoration. The same color should mean the same thing in every diagram on the page.
 
 ## The hub
 
@@ -36,26 +36,13 @@ Not every section needs all four. The order is a default, not a law.
 
 **Don't use a diagram for:** definitions (a sentence is sharper), linear prose (a diagram of "step 1 → step 2" is decoration), anything you could explain equally well in one sentence.
 
-One per section unless the section is fundamentally visual. Every diagram uses the visual grammar established in the blueprint's legend (see pattern 1 below).
+One per section unless the section is fundamentally visual. Use consistent colors across all diagrams — the same color means the same thing throughout the page.
 
-### The five template patterns
+### The four template patterns
 
 Every blueprint follows these. They are the load-bearing structure.
 
-**1. Visual grammar legend** — one line in the header, establishes the colors and symbols every diagram in the page will use:
-
-```html
-<div class="legend">
-  <span class="label">visual grammar</span>
-  <span class="swatch"><span class="dot" style="background:#1F7A6D;"></span><b>{{concept A}}</b></span>
-  <span class="swatch"><span class="dot" style="background:#B23A6E;"></span><b>{{concept B}}</b></span>
-  <span class="swatch"><span class="dot dashed"></span><b>{{counterfactual / imputed}}</b></span>
-</div>
-```
-
-The legend is taught once, used N times. A reader who has learned the grammar can scan every diagram without re-reading captions. Pick colors that carry meaning — `treated` vs `control`, `observed` vs `counterfactual` — not arbitrary decoration.
-
-**2. Modular sections** — each section opens with a chapter label and a title that is a *claim*, not a label:
+**1. Modular sections** — each section opens with a chapter label and a title that is a *claim*, not a label:
 
 - ✅ "Why the average difference between groups lies"
 - ✅ "Compare like with like"
@@ -64,7 +51,7 @@ The legend is taught once, used N times. A reader who has learned the grammar ca
 
 The title tells the reader what they'll understand by the end of the section. Sections are modular — no fixed order. Each picks from available blocks (prose, diagram, formula+where, key) as the topic needs.
 
-**3. Formula + "reading it"** — every formula is immediately followed by a plain-English breakdown that defines **every symbol, every time**. Vocabulary is re-stated, never assumed from earlier sections:
+**2. Formula + "reading it"** — every formula is immediately followed by a plain-English breakdown that defines **every symbol, every time**. Vocabulary is re-stated, never assumed from earlier sections:
 
 ```html
 <div class="formula">
@@ -83,7 +70,7 @@ The title tells the reader what they'll understand by the end of the section. Se
 
 This is the single highest-value pattern — the anti-false-aha mechanism. A reader who skips the formula can still read the breakdown; a reader who reads both actually understands the formula.
 
-**4. Per-section "Remember"** — at the end of each section, a one-sentence distillation of the load-bearing insight. Often encodes the corrected misconception:
+**3. Per-section "Remember"** — at the end of each section, a one-sentence distillation of the load-bearing insight. Often encodes the corrected misconception:
 
 ```html
 <div class="key">
@@ -94,7 +81,7 @@ This is the single highest-value pattern — the anti-false-aha mechanism. A rea
 
 "I thought X, but actually Y" lives here when the section is about a misconception the user held.
 
-**5. "In one breath" closing** — a single-paragraph synthesis of the whole topic. Each section's load-bearing insight strung together into one coherent statement:
+**4. "In one breath" closing** — a single-paragraph synthesis of the whole topic. Each section's load-bearing insight strung together into one coherent statement:
 
 ```html
 <section class="closing">
@@ -139,12 +126,6 @@ window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['$$','$$']
       <span>created: {{DATE}}</span>
       <span>last-updated: {{DATE}}</span>
       <span class="tags">{{tags}}</span>
-    </div>
-    <div class="legend">
-      <span class="label">visual grammar</span>
-      <span class="swatch"><span class="dot" style="background:#1F7A6D;"></span><b>{{concept A}}</b></span>
-      <span class="swatch"><span class="dot" style="background:#B23A6E;"></span><b>{{concept B}}</b></span>
-      <span class="swatch"><span class="dot dashed"></span><b>{{counterfactual}}</b></span>
     </div>
   </header>
 
@@ -224,7 +205,6 @@ A blueprint mirrors what one learning session produced. A focused session on DNS
 ### Filing checklist
 
 - [ ] Template used, all `<meta>` filled
-- [ ] Visual grammar legend present
 - [ ] Each section has a claim-title, not a label-title
 - [ ] Every formula has a "reading it" block defining every symbol
 - [ ] Each section has a "Remember" callout

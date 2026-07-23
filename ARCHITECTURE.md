@@ -64,17 +64,18 @@ Originally CONVENTIONS.md was tier-1 (short) with recipes as tier-2 (fetched on 
 
 ## 4. Blueprint structure
 
-Every blueprint follows five patterns, defined in CONVENTIONS.md:
+Every blueprint follows four patterns, defined in CONVENTIONS.md:
 
-1. **Visual grammar legend** — one line in the header, establishes colors/symbols used by every diagram. Taught once, used N times.
-2. **Modular sections** — each section has a chapter label (`.chno`) and a *claim-title* (`h2`), not a label-title. Sections pick from available blocks (prose, diagram, formula+where, key) as the topic needs.
-3. **Formula + "reading it"** — every formula is followed by a plain-English breakdown (`.where`) defining every symbol, every time. The anti-false-aha mechanism.
-4. **Per-section "Remember"** (`.key`) — one-sentence distillation at the end of each section. Not optional.
-5. **"In one breath" closing** (`.closing` / `.breath`) — single-paragraph synthesis. The "do I actually understand this?" test.
+1. **Modular sections** — each section has a chapter label (`.chno`) and a *claim-title* (`h2`), not a label-title. Sections pick from available blocks (prose, diagram, formula+where, key) as the topic needs.
+2. **Formula + "reading it"** — every formula is followed by a plain-English breakdown (`.where`) defining every symbol, every time. The anti-false-aha mechanism.
+3. **Per-section "Remember"** (`.key`) — one-sentence distillation at the end of each section. Not optional.
+4. **"In one breath" closing** (`.closing` / `.breath`) — single-paragraph synthesis. The "do I actually understand this?" test.
+
+Diagrams use consistent, meaningful colors throughout each blueprint (e.g. teal = evidence, magenta = inference) — the same color means the same thing in every diagram on the page. No visual grammar legend section is required; diagram text labels carry the meaning.
 
 ### Required class names
 Blueprints use these exact CSS class names because they map to `assets/blueprint.css`:
-`header.title`, `.eyebrow`, `h1.subtitle`, `.meta`, `.tags`, `.legend`, `.swatch`, `.dot`, `.chno`, `h2`, `.diagram`, `.caption`, `.formula`, `.lab`, `.eq`, `.where`, `.wlab`, `.key`, `.closing`, `.breath`, `.cross-refs`, `footer`
+`header.title`, `.eyebrow`, `h1.subtitle`, `.meta`, `.tags`, `.chno`, `h2`, `.toc`, `.diagram`, `.caption`, `.formula`, `.lab`, `.eq`, `.where`, `.wlab`, `.key`, `.closing`, `.breath`, `.cross-refs`, `footer`
 
 Do not invent custom class names — the shared CSS will not style elements it doesn't recognize.
 
@@ -108,7 +109,7 @@ Every push to `main` that touches `topics/**`, `assets/**`, or `scripts/**` trig
 Total time: ~30 seconds.
 
 ### `validate.py` — mechanical convention enforcement
-Replaces prompt-based "don't do X" instructions with deterministic CI checks. Catches: missing metas, relative CSS URLs, missing required class names, dangling cross-references to non-existent blueprints. Reference pages (`<meta name="blueprint-type" content="reference">`) are exempt from teaching-specific classes (legend, formula, where, key, closing, breath). Deploy fails on validation errors — immediate feedback.
+Replaces prompt-based "don't do X" instructions with deterministic CI checks. Catches: missing metas, relative CSS URLs, missing required class names, dangling cross-references to non-existent blueprints. Reference pages (`<meta name="blueprint-type" content="reference">`) are exempt from teaching-specific classes (formula, where, key, closing, breath). Deploy fails on validation errors — immediate feedback.
 
 ### `file-blueprint.sh` — filing hygiene
 A script agents run instead of doing 5 manual steps: `./scripts/file-blueprint.sh topics/<slug>.html "<log-message>"`. Validates, appends log.md, stages only source files (never generated index.html/manifest.json), commits, pushes. Prevents: running build-index.py locally, committing generated files, forgetting log.md.
