@@ -101,7 +101,7 @@ Every push to `main` that touches `topics/**`, `assets/**`, or `scripts/**` trig
 1. **`validate.py` runs** — checks all `topics/*.html` against conventions (required metas, absolute CSS URL, required class names, no dangling cross-refs). Fails the build if violations found.
 2. **`build-index.py` runs** — scans all `topics/*.html`, extracts `<meta>` tags and `<a href>` links between blueprints
 3. **Generates two files:**
-   - `index.html` — visual landing page (lists blueprints, shows quiz nudges, shows graph edges)
+   - `index.html` — visual landing page (lists blueprints, search, tag filters, quiz nudges). The cross-reference graph is not rendered here; it lives in `manifest.json`
    - `manifest.json` — machine-readable metadata (filename, title, tags, prerequisites, last-quizzed, links-to, linked-by)
 4. **Commits them back** with `[skip ci]` (no infinite loop)
 5. **Deploys to Cloudflare Pages** via `cloudflare/pages-action@v1`
