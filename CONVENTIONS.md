@@ -121,6 +121,8 @@ window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['$$','$$']
 <body>
 <div class="page">
 
+  <nav class="crumb"><a href="../">Learning Hub</a><span>/</span>{{slug}}</nav>
+
   <header class="title">
     <div class="eyebrow">Intuition Blueprint</div>
     <h1>{{central question}}<span class="subtitle">{{topic}}</span></h1>
@@ -197,6 +199,8 @@ The graph is the structure. Before filing a new or edited blueprint:
 1. If you can see existing blueprints, link to related ones in the body AND in the `cross-refs` block. Edit those blueprints to link back. One write touches multiple files.
 2. Categories emerge as clusters of cross-links. There is no `taxonomy.md` and no enforced hierarchy.
 3. **If you can't see existing blueprints** (phone session, private repo unreachable): produce a standalone blueprint. **Do not create `<a>` links to blueprints you cannot verify exist** — a link to a non-existent file is a dangling reference that breaks the graph. Instead, list related concepts as HTML comments (`<!-- future blueprint: dns.html -->`) for the user to wire up from laptop. The user maintains the graph from laptop.
+
+**Breadcrumb back-link:** every blueprint opens with `<nav class="crumb">` pointing home. The href **must** be `../`, not `/index.html`. `validate.py` collects every body `<a>` whose href ends in `.html` and errors if the basename isn't a file in `topics/` — so an `index.html` back-link fails validation and blocks every future deploy. `../` doesn't end in `.html`, so the check skips it, and it resolves to the index from `topics/`.
 
 **Manifest (best-effort):** `https://learning-hub-3qh.pages.dev/manifest.json` lists all blueprints with metadata (filename, title, tags, prerequisites, last-quizzed). If you can fetch it, use it for cross-referencing. If your environment blocks it, skip — the blueprint works standalone.
 
