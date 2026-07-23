@@ -241,20 +241,25 @@ cp learning-hub-rules/skills/learn/SKILL.md ~/.claude/skills/learn/SKILL.md
 - `/learn` skill — three modes (teach / crystallize / build), installed for opencode and Claude Code
 - GitHub Action — validate → rebuild index + manifest → deploy to Cloudflare Pages
 - `validate.py` — mechanical convention enforcement (metas, CSS URL, class names, cross-refs)
-- `file-blueprint.sh` — filing hygiene script (validate → log → stage → commit → push)
+- `file-blueprint.sh` — filing hygiene script (validate → log → stage → commit → push). Stages `topics/*.html`, `assets/*.css`, `.gitignore`, `log.md`. Supports `ingest|refine|lint` log types. Auto-detects Add vs Refine for commit messages.
 - `manifest.json` — public metadata for cross-referencing
 - `build-index.py` — scans topics, generates index and manifest
-- 3 blueprints in the hub: `causal-inference.html`, `simple-regression.html`, `system-architecture.html`
+- `.toc` styles promoted to shared `blueprint.css` (were inline in each blueprint, causing an unstyled TOC when a new blueprint omitted them)
+- 4 blueprints in the hub: `causal-inference.html`, `simple-regression.html`, `system-architecture.html`, `llm-wiki.html`
 - Cloudflare Pages deploy verified (both via Action and manual wrangler)
+- Claude Code permission patterns in `learning-as-you-go/.claude/settings.json` — pre-approves `./scripts/*`, read-only git, known WebFetch domains, WebSearch. Eliminates per-command permission prompts during sessions.
 
 ### Tested
 - **Laptop flow (opencode)** — end-to-end test completed: opencode + DeepSeek V4 Pro
   built an IPv4-vs-IPv6 blueprint, filed it, pushed, GitHub Action validated + built
   index + deployed to Cloudflare Pages. Full cycle: 2m 39s, $0.02. validate.py passed
   in CI. Blueprint live and in manifest. Test blueprint cleaned up after verification.
-- **Laptop flow (Claude Code)** — partial test via Herdr. Skill loaded correctly,
-  conventions fetched, mode inferred correctly. Permission prompts created friction
-  in the Herdr-automated test setup but don't affect normal interactive use.
+- **Laptop flow (Claude Code, real session)** — first real blueprint built with Claude
+  Code (Opus 4.8): `llm-wiki.html` (Karpathy's LLM Wiki pattern). TEACH mode inferred
+  correctly, Socratic quiz run (4 questions + synthesis), blueprint generated with 5 SVG
+  diagrams, cross-refs wired both directions, self-corrected two accuracy issues after
+  drafting. Filed and deployed. Surfaced three operational issues (see Known issues) -
+  all fixed.
 - **Parallel skill testing** — 5 agents tested simultaneously via Herdr (3 Claude Code,
   2 opencode). All agents that processed prompts followed the SKILL.md correctly:
   right mode inference, right flow steps, no premature questions, no plan mode friction.
@@ -268,11 +273,22 @@ cp learning-hub-rules/skills/learn/SKILL.md ~/.claude/skills/learn/SKILL.md
   pointer is there). Paste when ready to test the phone flow.
 
 ### Known issues
-- **Agent sometimes skips `file-blueprint.sh`** — in the e2e test, the agent used
-  `git pull --rebase && git push` manually instead of the filing script. Outcome was
-  correct (right commit message, log.md appended, only source files committed) but
-  the script also runs `validate.py` before committing — the agent skipped local
-  validation and relied on CI. SKILL.md updated to make the script instruction more
-  prominent and explicit ("Always use this script. Do not run git commands manually.")
+- **Agent sometimes skips `file-blueprint.sh`** — happened in both the opencode e2e
+  test and the Claude Code llm-wiki session. The agent runs `git pull --rebase && git
+  push` manually instead of the filing script, skipping local validation. SKILL.md now
+  says "Always use this script. Do not run `git add`, `git commit`, `git push`, or
+  `build-index.py` yourself." Watch whether this holds in the next session.
+- **Duplicate clone risk** — the Claude Code session created a second clone at
+  `~/playground/learning-hub` because SKILL.md used that path as an example. The agent
+  took it literally and cloned there instead of finding the existing clone at
+  `learning-as-you-go/learning-hub`. Fixed: SKILL.md now says to search current dir,
+  parent, and `~/playground/` for an existing clone, and only clone if none found.
+- **Inline CSS duplication** — `.toc` styles were copy-pasted into each blueprint's
+  `<style>` block instead of living in `blueprint.css`. The llm-wiki blueprint omitted
+  them, producing an unstyled TOC. Fixed: `.toc` promoted to `blueprint.css`, inline
+  copies stripped from `causal-inference.html` and `simple-regression.html`.
+  `file-blueprint.sh` now stages `assets/*.css` so future CSS changes flow through the
+  script.
 - **Lint** — `recipes/lint.md` describes health checks (orphan blueprints, missing
-  backlinks, contradictions). Worth running once there are 4+ blueprints.
+  backlinks, contradictions). Worth running once there are 6+ blueprints. Deferred -
+  don't over-engineer before real usage reveals what actually matters.
