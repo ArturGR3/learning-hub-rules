@@ -44,7 +44,7 @@ The user knows what they want and just wants the artifact.
 
 **If you have repo access** (opencode, Claude Code):
 
-1. Find or clone the `learning-hub` repo. Try the local filesystem first (e.g. `~/playground/learning-hub`); clone `ArturGR3/learning-hub` if not found.
+1. Find or clone the `learning-hub` repo. **Do not guess a path** — search for it: check the current directory, its parent, and `~/playground/` for an existing `learning-hub` directory containing a `.git` folder. If found, use it. Only if none exists, clone `ArturGR3/learning-hub` into `~/playground/learning-hub`. Never create a second clone when one already exists on disk.
 2. Save the blueprint to `topics/<slug>.html`.
 3. Maintain cross-references: scan `topics/`, link related blueprints both directions. Edit linked blueprints to add back-links.
 4. **File using the script — do not run git commands manually:**
