@@ -47,8 +47,13 @@ The user knows what they want and just wants the artifact.
 1. Find or clone the `learning-hub` repo. Try the local filesystem first (e.g. `~/playground/learning-hub`); clone `ArturGR3/learning-hub` if not found.
 2. Save the blueprint to `topics/<slug>.html`.
 3. Maintain cross-references: scan `topics/`, link related blueprints both directions. Edit linked blueprints to add back-links.
-4. Run `scripts/file-blueprint.sh topics/<slug>.html "{{topic}} — {{one-line summary}}"` from the repo root. This validates the blueprint, appends log.md, stages source files, commits, and pushes. **Don't run build-index.py locally** — the GitHub Action regenerates index.html and manifest.json on push.
-5. The Action rebuilds and deploys (~30s).
+4. **File using the script — do not run git commands manually:**
+
+   ```bash
+   ./scripts/file-blueprint.sh topics/<slug>.html "{{topic}} — {{one-line summary}}"
+   ```
+
+   This script validates the blueprint, appends log.md, stages only source files, commits, and pushes. **Always use this script.** Do not run `git add`, `git commit`, `git push`, or `build-index.py` yourself — the script handles all of that, and the GitHub Action regenerates `index.html` and `manifest.json` on push.
 
 **If you don't have repo access** (claude.ai phone session): output the complete HTML for the user to copy into GitHub manually. Note cross-refs for laptop follow-up.
 

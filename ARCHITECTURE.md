@@ -246,9 +246,33 @@ cp learning-hub-rules/skills/learn/SKILL.md ~/.claude/skills/learn/SKILL.md
 - `build-index.py` — scans topics, generates index and manifest
 - 3 blueprints in the hub: `causal-inference.html`, `simple-regression.html`, `system-architecture.html`
 - Cloudflare Pages deploy verified (both via Action and manual wrangler)
-- First end-to-end laptop test completed (simple-regression blueprint built, filed, deployed)
 
-### Not yet done
-- **claude.ai Project instructions** — the full guardrail instructions have been prepared but not yet pasted into the Project settings (only the one-line fetch pointer is there).
-- **End-to-end test of new three-mode skill** — the simple-regression test used the old SKILL.md. The restructured skill (teach/crystallize/build) needs a real test to verify the flows work.
-- **Lint** — `recipes/lint.md` describes health checks (orphan blueprints, missing backlinks, contradictions). Worth running once there are 4+ blueprints.
+### Tested
+- **Laptop flow (opencode)** — end-to-end test completed: opencode + DeepSeek V4 Pro
+  built an IPv4-vs-IPv6 blueprint, filed it, pushed, GitHub Action validated + built
+  index + deployed to Cloudflare Pages. Full cycle: 2m 39s, $0.02. validate.py passed
+  in CI. Blueprint live and in manifest. Test blueprint cleaned up after verification.
+- **Laptop flow (Claude Code)** — partial test via Herdr. Skill loaded correctly,
+  conventions fetched, mode inferred correctly. Permission prompts created friction
+  in the Herdr-automated test setup but don't affect normal interactive use.
+- **Parallel skill testing** — 5 agents tested simultaneously via Herdr (3 Claude Code,
+  2 opencode). All agents that processed prompts followed the SKILL.md correctly:
+  right mode inference, right flow steps, no premature questions, no plan mode friction.
+
+### Not yet tested
+- **Phone flow (claude.ai)** — not tested. Will test once there are more blueprints
+  in the hub and the system has been used in real sessions. Don't over-engineer before
+  real usage reveals what actually matters.
+- **claude.ai Project instructions** — the full guardrail instructions have been
+  prepared but not yet pasted into the Project settings (only the one-line fetch
+  pointer is there). Paste when ready to test the phone flow.
+
+### Known issues
+- **Agent sometimes skips `file-blueprint.sh`** — in the e2e test, the agent used
+  `git pull --rebase && git push` manually instead of the filing script. Outcome was
+  correct (right commit message, log.md appended, only source files committed) but
+  the script also runs `validate.py` before committing — the agent skipped local
+  validation and relied on CI. SKILL.md updated to make the script instruction more
+  prominent and explicit ("Always use this script. Do not run git commands manually.")
+- **Lint** — `recipes/lint.md` describes health checks (orphan blueprints, missing
+  backlinks, contradictions). Worth running once there are 4+ blueprints.
